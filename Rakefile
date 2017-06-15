@@ -9,4 +9,4 @@ require 'rake'
 # rubocop:disable HandleExceptions
 begin; require 'parallel_tests/tasks'; rescue LoadError; end
 # rubocop:enable HandleExceptions
-Reservations::Application.load_tasks
+Rez::Application.load_tasks

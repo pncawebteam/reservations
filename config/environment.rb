@@ -21,4 +21,4 @@ unless defined? APP_VERSION
 end
 
 # Initialize the rails application
-Reservations::Application.initialize!
+Rez::Application.initialize!

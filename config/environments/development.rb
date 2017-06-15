@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 Rails.application.configure do
+
+  config.rez.domain = '.local.dev'
+
+  config.rez.root_url = "http://rez.local.dev"
+
+  config.ida.root_url = "http://id.local.dev"
+
   # Settings specified here will take precedence over those in config/
   # application.rb
 

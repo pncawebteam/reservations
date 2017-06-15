@@ -7,7 +7,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups(:default, Rails.env))
 
-module Reservations
+module Rez
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified
     # here.
@@ -72,5 +72,10 @@ module Reservations
       Rails.application.routes.default_url_options =
         config.action_mailer.default_url_options
     end
+
+    # Custom app configuration options
+    config.ida    = ActiveSupport::OrderedOptions.new
+    config.rez    = ActiveSupport::OrderedOptions.new
+
   end
 end

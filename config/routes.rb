@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-Reservations::Application.routes.draw do
+Rez::Application.routes.draw do
   root to: 'catalog#index'
 
   # routes for Devise
@@ -167,5 +167,5 @@ Reservations::Application.routes.draw do
                                                        :delete]
 
   # this is a fix for running letter opener inside vagrant
-  mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
+  # mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
 end

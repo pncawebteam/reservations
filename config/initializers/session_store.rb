@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-# Be sure to restart your server when you modify this file.
+Rez::Application.config.session_store :active_record_store, domain: "#{Rez::Application.config.rez.domain}", key: '_pnca_ida_session'
 
-Rails.application.config.session_store :cookie_store,
-                                       key: '_reservations_session'
+ActiveRecord::SessionStore::Session.establish_connection "ida_#{Rails.env}".to_sym

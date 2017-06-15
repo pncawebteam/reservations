@@ -271,6 +271,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-darwin-16
 
 DEPENDENCIES
   activerecord-session_store
@@ -323,4 +324,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.12.5
+   1.14.5

@@ -9,7 +9,7 @@ class AddOrdering < ActiveRecord::Migration
 
     # go through all categories
     models = conn.exec_query('SELECT * FROM equipment_models WHERE '\
-                             'active = 1')
+                             'active = true')
   	ord = 1
   	models.each do |m|
       conn.execute("UPDATE equipment_models SET ordering = "\
@@ -21,4 +21,3 @@ class AddOrdering < ActiveRecord::Migration
   	remove_column :equipment_models, :ordering
   end
 end
-

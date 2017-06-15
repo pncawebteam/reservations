@@ -27,7 +27,7 @@ module Rez
     # auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names.
     # Default is UTC.
-    config.time_zone = 'Eastern Time (US & Canada)'
+    config.time_zone = 'Pacific Time (US & Canada)'
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true

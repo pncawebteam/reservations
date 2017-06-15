@@ -4,17 +4,6 @@ require 'net/ldap'
 class User < ActiveRecord::Base
   include Linkable
 
-  # Include authentication modules
-  # If the CAS_AUTH environment variable is set, we simply include the
-  # :cas_authenticatable module. If not, we implement password authentcation
-  # using the :database_authenticatable module and also allow for password
-  # resets.
-  if ENV['CAS_AUTH']
-    devise :cas_authenticatable
-  else
-    devise :database_authenticatable, :recoverable, :rememberable
-  end
-
   has_many :reservations, foreign_key: 'reserver_id', dependent: :destroy
   has_and_belongs_to_many :requirements,
                           class_name: 'Requirement',
@@ -32,22 +21,10 @@ class User < ActiveRecord::Base
                     format: { with: %r{\A[0-9\+\/\(\)\s\-]*\z} },
                     length: { minimum: 10 },
                     unless: ->(u) { u.skip_phone_validation? }
-
   validates :email,
             presence: true, uniqueness: true,
             format: { with: /\A([\w\.%\+\-]+)@([\w\-]+\.)+([\w]{2,})\z/i }
-  # validations for CAS authentication
-  if ENV['CAS_AUTH']
-    validates :cas_login, presence: true, uniqueness: true
-  # validations for password authentication
-  else
-    # only run password validatons if the parameter is present
-    validates :password,  presence: true,
-                          length: { minimum: 8 },
-                          unless: ->(u) { u.password.nil? }
-    # check password confirmations
-    validates :password, confirmation: :true, on: [:create, :update]
-  end
+
   validates :nickname,    format:      { with: /\A[^0-9`!@#\$%\^&*+_=]+\z/ },
                           allow_blank: true
   validates :terms_of_service_accepted,

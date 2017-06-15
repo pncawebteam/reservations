@@ -2,11 +2,6 @@
 Rez::Application.routes.draw do
   root to: 'catalog#index'
 
-  # routes for Devise
-  devise_scope :user do
-    devise_for :users
-  end
-
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
   ## Concerns

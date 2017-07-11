@@ -47,7 +47,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    if @user.role == 'banned' && @user.id != current_user.id
+    if @user.role == 'banned' && @user.id != @current_user.id
       flash[:error] = 'Please note that this user is banned.'
     end
     @user_reservations = @user.reservations.includes(:equipment_item,
@@ -67,15 +67,15 @@ class UsersController < ApplicationController
     # if CAS authentication
     if @cas_auth
       # variable used in view
-      @can_edit_username = current_user.present? && (can? :create, User)
-      if current_user.nil? && session[:new_username]
+      @can_edit_username = @current_user.present? && (can? :create, User)
+      if @current_user.nil? && session[:new_username]
         # This is a new user -> create an account for them
         @user = User.new(User.search_ldap(session[:new_username]))
         @user.username = session[:new_username] # default to current username
         flash[:notice] = 'Hey there! Since this is your first time making a '\
           'reservation, we\'ll need you to supply us with some basic '\
           'contact information.'
-      elsif current_user.nil?
+      elsif @current_user.nil?
         # we don't have the current session's username
         # THIS ONLY APPLIES TO CAS
         flash[:error] = 'Something seems to have gone wrong. Please try '\
@@ -88,7 +88,7 @@ class UsersController < ApplicationController
     else
       @can_edit_username = true
       @user = User.new
-      if current_user
+      if @current_user
         @user = User.new
       else
         flash[:notice] = 'Hey there! Since this is your first time making a '\
@@ -106,7 +106,7 @@ class UsersController < ApplicationController
     if @cas_auth
       # pull from our CAS hackery if you're not an admin/superuser creating a
       # new user
-      if current_user && can?(:manage, Reservation)
+      if @current_user && can?(:manage, Reservation)
         @user.cas_login = user_params[:username]
       else
         @user.cas_login = session[:new_username]
@@ -121,11 +121,11 @@ class UsersController < ApplicationController
       session.delete(:new_username) if @cas_auth
       flash[:notice] = 'Successfully created user.'
       # log in the new user
-      sign_in @user, bypass: true unless current_user.present?
+      sign_in @user, bypass: true unless @current_user.present?
       redirect_to user_path(@user)
     else
       # variable used in view
-      @can_edit_username = current_user.present? && (can? :create, User)
+      @can_edit_username = @current_user.present? && (can? :create, User)
       render :new
     end
   end
@@ -165,16 +165,16 @@ class UsersController < ApplicationController
 
   def edit
     # refer to the page as Profile if current user, and as User elsewise
-    @edit_title_text = (current_user == @user) ? 'Profile' : 'User'
+    @edit_title_text = (@current_user == @user) ? 'Profile' : 'User'
     @can_edit_username = can? :edit_username, User
   end
 
   def update # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-    @edit_title_text = (current_user == @user) ? 'Profile' : 'User'
+    @edit_title_text = (@current_user == @user) ? 'Profile' : 'User'
     par = user_params
     # use :update_with_password when we're not using CAS and you're editing
     # your own profile
-    if @cas_auth || ((can? :manage, User) && (@user.id != current_user.id))
+    if @cas_auth || ((can? :manage, User) && (@user.id != @current_user.id))
       method = :update_attributes
       # delete the current_password key from the params hash just in case it's
       # present (and :update_attributes will throw an error)
@@ -187,7 +187,7 @@ class UsersController < ApplicationController
     if @user.send(method, par)
       # sign in the user if you've edited yourself since you have a new
       # password, otherwise don't
-      sign_in @user, bypass: true if @user.id == current_user.id
+      sign_in @user, bypass: true if @user.id == @current_user.id
       flash[:notice] = 'Successfully updated user.'
       redirect_to user_path(@user)
     else
@@ -200,7 +200,7 @@ class UsersController < ApplicationController
       flash[:error] = 'Cannot ban guest.'
       redirect_to(request.referer) && return
     end
-    if @user == current_user
+    if @user == @current_user
       flash[:error] = 'You cannot ban yourself.'
       redirect_to(request.referer) && return
     end

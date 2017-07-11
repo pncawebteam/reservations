@@ -4,6 +4,10 @@ Rez::Application.routes.draw do
 
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
+  # ________________ Ida ________________ #
+  get 'login', to: 'sessions#new', as: :login
+  get 'logout', to: 'sessions#destroy', as: :logout
+  
   ## Concerns
   concern :deactivatable do
     member do

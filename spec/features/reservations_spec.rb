@@ -22,7 +22,7 @@ describe 'Reservations', type: :feature do
         click_link 'Reserve', href: new_reservation_path
 
         # set reserver to current user if unset, check confirmation page
-        reserver = reserver ? reserver : @current_user
+        reserver = reserver ? reserver : @@current_user
         expect(page).to have_content reserver.name
         expect(page).to have_content Time.zone.today.to_s(:long)
         expect(page).to have_content due_date.to_s(:long)
@@ -59,7 +59,7 @@ describe 'Reservations', type: :feature do
         click_link 'Reserve', href: new_reservation_path
 
         # set reserver to current user if unset, check confirmation page
-        reserver = reserver ? reserver : @current_user
+        reserver = reserver ? reserver : @@current_user
         expect(page).to have_content reserver.name
         expect(page).to have_content Time.zone.today.to_s(:long)
         expect(page).to have_content bad_due_date.to_s(:long)
@@ -97,7 +97,7 @@ describe 'Reservations', type: :feature do
         click_link 'Reserve', href: new_reservation_path
 
         # set reserver to current user if unset, check confirmation page
-        reserver = reserver ? reserver : @current_user
+        reserver = reserver ? reserver : @@current_user
         expect(page).to have_content reserver.name
         expect(page).to have_content Time.zone.today.to_s(:long)
         expect(page).to have_content bad_due_date.to_s(:long)
@@ -208,9 +208,9 @@ describe 'Reservations', type: :feature do
         click_button 'Check-In Equipment'
 
         expect(page).to have_content 'Check-In Receipt'
-        expect(page).to have_content current_user.name
+        expect(page).to have_content @current_user.name
         @checked_out_res.reload
-        expect(@checked_out_res.checkin_handler).to eq(current_user)
+        expect(@checked_out_res.checkin_handler).to eq(@current_user)
         expect(@checked_out_res.checked_in).not_to be_nil
       end
       it 'cannot checkout successfully' do
@@ -262,15 +262,15 @@ describe 'Reservations', type: :feature do
         click_button 'Check-Out Equipment'
 
         expect(page).to have_content 'Check-Out Receipt'
-        expect(page).to have_content current_user.name
+        expect(page).to have_content @current_user.name
         @res.reload
         expect(@res.equipment_item_id).to eq(@eq_model.equipment_items.first.id)
-        expect(@res.checkout_handler).to eq(current_user)
+        expect(@res.checkout_handler).to eq(@current_user)
         expect(@res.checked_out).not_to be_nil
         # check equipment item notes if admin or superuser (checkout persons
         # can't see them)
-        if current_user.view_mode == 'admin' ||
-           current_user.view_mode == 'superuser'
+        if @current_user.view_mode == 'admin' ||
+           @current_user.view_mode == 'superuser'
           visit equipment_item_path(@res.equipment_item)
           expect(page).to have_link('Checked out', href: resource_url(@res))
         end
@@ -281,12 +281,12 @@ describe 'Reservations', type: :feature do
         click_button 'Check-In Equipment'
 
         expect(page).to have_content 'Check-In Receipt'
-        expect(page).to have_content current_user.name
+        expect(page).to have_content @current_user.name
         @res.reload
-        expect(@res.checkin_handler).to eq(current_user)
+        expect(@res.checkin_handler).to eq(@current_user)
         expect(@res.checked_in).not_to be_nil
-        if current_user.view_mode == 'admin' ||
-           current_user.view_mode == 'superuser'
+        if @current_user.view_mode == 'admin' ||
+           @current_user.view_mode == 'superuser'
           visit equipment_item_path(@res.equipment_item)
           expect(page).to have_link('Checked in', href: resource_url(@res))
         end
@@ -392,11 +392,11 @@ describe 'Reservations', type: :feature do
           click_button 'Check-Out Equipment'
 
           expect(page).to have_content 'Check-Out Receipt'
-          expect(page).to have_content current_user.name
+          expect(page).to have_content @current_user.name
           @res.reload
           expect(@res.equipment_item_id).to \
             eq(@eq_model.equipment_items.first.id)
-          expect(@res.checkout_handler).to eq(current_user)
+          expect(@res.checkout_handler).to eq(@current_user)
           expect(@res.checked_out).not_to be_nil
         end
       end

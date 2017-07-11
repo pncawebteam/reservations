@@ -61,13 +61,13 @@ describe 'Authentication' do
       it 'signs in the right user' do
         visit root_path
         expect(page).to have_content(@checkout_person.name)
-        expect(page).not_to have_link 'Sign In', href: new_user_session_path
+        expect(page).not_to have_link 'Sign In', href: login_path
       end
 
       it 'can also sign out' do
         sign_out
         visit root_path
-        expect(page).to have_link 'Sign In', href: new_user_session_path
+        expect(page).to have_link 'Sign In', href: login_path
         expect(page).not_to have_content(@checkout_person.name)
       end
     end

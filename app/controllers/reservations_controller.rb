@@ -73,7 +73,7 @@ class ReservationsController < ApplicationController
     source = if can? :manage, Reservation
                Reservation
              else
-               current_user.reservations
+               @current_user.reservations
              end
 
     time = if session[:all_dates]
@@ -155,10 +155,10 @@ class ReservationsController < ApplicationController
         reserver = cart.reserver_id
         notes = format_errors(@errors) + notes.to_s
         if requested
-          flash[:notice] = cart.request_all(current_user,
+          flash[:notice] = cart.request_all(@current_user,
                                             params[:reservation][:notes])
         else
-          flash[:notice] = cart.reserve_all(current_user,
+          flash[:notice] = cart.reserve_all(@current_user,
                                             params[:reservation][:notes])
         end
 
@@ -199,14 +199,14 @@ class ReservationsController < ApplicationController
       # check to see if new item is available
       unless new_item.available?
         r = new_item.current_reservation
-        r.update(current_user,
+        r.update(@current_user,
                  { equipment_item_id: @reservation.equipment_item_id },
                  '')
       end
     end
 
     # save changes to database
-    @reservation.update(current_user, res, params[:new_notes])
+    @reservation.update(@current_user, res, params[:new_notes])
     if @reservation.save
       # code for switching equipment items
       unless params[:equipment_item].blank?
@@ -219,9 +219,9 @@ class ReservationsController < ApplicationController
         end
 
         # update the item history / histories
-        old_item.make_switch_notes(@reservation, r, current_user) if old_item
+        old_item.make_switch_notes(@reservation, r, @current_user) if old_item
 
-        new_item.make_switch_notes(r, @reservation, current_user)
+        new_item.make_switch_notes(r, @reservation, @current_user)
       end
 
       # flash success and exit
@@ -277,7 +277,7 @@ class ReservationsController < ApplicationController
       # to the @user we're checking out for (params hacking?)
       next if r.reserver != @user
       checked_out_reservations <<
-        r.checkout(r_attrs[:equipment_item_id], current_user,
+        r.checkout(r_attrs[:equipment_item_id], @current_user,
                    r_attrs[:checkout_procedures], r_attrs[:notes])
     end
 
@@ -339,7 +339,7 @@ class ReservationsController < ApplicationController
         redirect_to(:back) && return # rubocop:disable NonLocalExitFromIterator
       end
 
-      checked_in_reservations << r.checkin(current_user,
+      checked_in_reservations << r.checkin(@current_user,
                                            r_attrs[:checkin_procedures],
                                            r_attrs[:notes])
     end
@@ -392,7 +392,7 @@ class ReservationsController < ApplicationController
   end
 
   def current
-    if params[:banned] && current_user.view_mode != 'superuser'
+    if params[:banned] && @current_user.view_mode != 'superuser'
       redirect_to(root_path) && return
     end
     @user_overdue_reservations_set =
@@ -420,7 +420,7 @@ class ReservationsController < ApplicationController
   end
 
   def renew
-    message = @reservation.renew(current_user)
+    message = @reservation.renew(@current_user)
     if message
       flash[:error] = message
       redirect_to(@reservation) && return
@@ -443,7 +443,7 @@ class ReservationsController < ApplicationController
     @reservation.status = 'reserved'
     @reservation.notes = @reservation.notes.to_s # in case of nil
     @reservation.notes += "\n\n### Approved on #{Time.zone.now.to_s(:long)} "\
-      "by #{current_user.md_link}"
+      "by #{@current_user.md_link}"
     if @reservation.save
       flash[:notice] = 'Request successfully approved'
       UserMailer.reservation_status_update(@reservation,
@@ -460,7 +460,7 @@ class ReservationsController < ApplicationController
     @reservation.status = 'denied'
     @reservation.notes = @reservation.notes.to_s # in case of nil
     @reservation.notes += "\n\n### Denied on #{Time.zone.now.to_s(:long)} by "\
-      "#{current_user.md_link}"
+      "#{@current_user.md_link}"
     if @reservation.save
       flash[:notice] = 'Request successfully denied'
       UserMailer.reservation_status_update(@reservation).deliver_now
@@ -487,17 +487,17 @@ class ReservationsController < ApplicationController
     end
 
     begin
-      @reservation.archive(current_user, params[:archive_note])
+      @reservation.archive(@current_user, params[:archive_note])
                   .save(validate: false)
       # archive equipment item if checked out
       if @reservation.equipment_item
         @reservation.equipment_item
                     .make_reservation_notes('archived',
-                                            @reservation, current_user,
+                                            @reservation, @current_user,
                                             params[:archive_note],
                                             @reservation.checked_in)
         if AppConfig.check(:autodeactivate_on_archive)
-          @reservation.equipment_item.deactivate(user: current_user,
+          @reservation.equipment_item.deactivate(user: @current_user,
                                                  reason: params[:archive_note])
           flash_end = ' The equipment item has been automatically deactivated.'
         end

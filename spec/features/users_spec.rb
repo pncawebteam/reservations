@@ -14,7 +14,7 @@ describe 'Users', type: :feature do
 
     shared_examples 'cannot ban self' do
       it do
-        me = current_user
+        me = @current_user
         visit user_path(me)
         expect(page).not_to have_link 'Ban', href: ban_user_path(@user)
       end

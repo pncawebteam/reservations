@@ -155,14 +155,14 @@ describe TestController, type: :controller do
       get :index
       expect(session[:cart].reserver_id).to eq(@user.id)
     end
-    it 'sets the session[:cart].reserver_id to current_user.id if '\
-      '!cart.reserver_id && current_user' do
+    it 'sets the session[:cart].reserver_id to @current_user.id if '\
+      '!cart.reserver_id && @current_user' do
       session[:cart] = Cart.new
       get :index
       expect(session[:cart].reserver_id).to eq(@user.id)
     end
     it 'returns session[:cart] without a reserver_id if !cart.reserver_id '\
-      '&& !current_user' do
+      '&& !@current_user' do
       sign_out @user
       session[:cart] = Cart.new
       get :index

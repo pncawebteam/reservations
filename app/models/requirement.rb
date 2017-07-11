@@ -17,7 +17,7 @@ class Requirement < ActiveRecord::Base
   # rubocop:disable MethodLength
   def self.list_requirement_admins(current_user, equipment_model)
     req_status = '<ul>'
-    met_reqs = (equipment_model.requirements & current_user.requirements)
+    met_reqs = (equipment_model.requirements & @current_user.requirements)
     outstanding_reqs = equipment_model.requirements - met_reqs
     admin_names = outstanding_reqs.collect(&:contact_name).to_sentence
     admin_contacts = outstanding_reqs.collect(&:contact_info).to_sentence

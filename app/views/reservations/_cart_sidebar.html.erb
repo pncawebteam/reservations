@@ -20,7 +20,7 @@
         <%= 'Reserve'.titleize %>
       <% end %>
     <% else %>
-      <%= link_to new_user_session_path, class: 'btn btn-success' do %>
+      <%= link_to login_path, class: 'btn btn-success' do %>
         <%= content_tag :i, nil, class: 'fa fa-sign-in' %>
         <%= 'Sign in'.titleize %>
       <% end %>

@@ -68,23 +68,23 @@ module FeatureHelpers
     click_link 'Sign In', match: :first
     fill_in_login(user)
     click_button 'Sign in'
-    @current_user = user
+    @@current_user = user
   end
 
   def sign_out
     visit root_path
     click_link 'Log Out' if has_link?('Log Out')
-    @current_user = nil
+    @@current_user = nil
   end
 
-  def current_user
-    if @current_user
-      @current_user
+  def @current_user
+    if @@current_user
+      @@current_user
     else
       visit root_path
       click_link 'My Profile'
       email = find('.page-header h1 small').text
-      @current_user = User.find_by_email(email)
+      @@current_user = User.find_by_email(email)
     end
   end
 

@@ -10,10 +10,10 @@
       <%= hidden_field_tag 'reserver_id', cart.reserver_id %>
       <div class="input-group">
         <%= autocomplete_field_tag 'fake_reserver_id',
-          cart.reserver_id == current_user.id ? '' : User.find(cart.reserver_id).render_name,
+          cart.reserver_id == @current_user.id ? '' : User.find(cart.reserver_id).render_name,
           autocomplete_user_last_name_users_path,
           size: 30,
-          placeholder: current_user.render_name,
+          placeholder: @current_user.render_name,
           id_element: "#reserver_id",
           class: 'submittable form-control' %>
         <% if can? :create, User %>
@@ -23,7 +23,7 @@
         <% end %>
       </div>
 
-    <% elsif current_user %>
+    <% elsif @current_user %>
       <div class="cart_reserver">
         <%= hidden_field_tag 'reserver_id', cart.reserver.id  %>
       </div>

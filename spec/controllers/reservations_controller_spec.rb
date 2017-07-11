@@ -1427,7 +1427,7 @@ describe ReservationsController, type: :controller do
 
       context 'when accessed by admin' do
         before(:each) do
-          allow(@controller).to receive(:current_user).and_return(@admin)
+          allow(@controller).to receive(:@current_user).and_return(@admin)
         end
 
         context 'with archive note' do
@@ -1480,7 +1480,7 @@ describe ReservationsController, type: :controller do
       context 'when accessed by checkout person' do
         before(:each) do
           allow(@controller).to\
-            receive(:current_user).and_return(@checkout_person)
+            receive(:@current_user).and_return(@checkout_person)
         end
 
         include_examples 'cannot archive reservation'
@@ -1488,7 +1488,7 @@ describe ReservationsController, type: :controller do
 
       context 'when accessed by patron' do
         before(:each) do
-          allow(@controller).to receive(:current_user).and_return(@user)
+          allow(@controller).to receive(:@current_user).and_return(@user)
         end
 
         include_examples 'cannot archive reservation'
@@ -1497,7 +1497,7 @@ describe ReservationsController, type: :controller do
 
     context 'for checked-in reservations' do
       before(:each) do
-        allow(@controller).to receive(:current_user).and_return(@admin)
+        allow(@controller).to receive(:@current_user).and_return(@admin)
         @reservation =
           FactoryGirl.build(:checked_in_reservation, reserver: @user)
         @reservation.save(validate: false)

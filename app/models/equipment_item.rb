@@ -81,7 +81,7 @@ class EquipmentItem < ActiveRecord::Base
     changes = self.changes
     return self if changes.empty?
     new_notes = "#### Edited at #{Time.zone.now.to_s(:long)} by "\
-      "#{current_user.md_link}\n\n"
+      "#{@current_user.md_link}\n\n"
     new_notes += "\n\n#### Changes:"
     changes.each do |param, diff|
       case param

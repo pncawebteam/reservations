@@ -134,7 +134,7 @@ class EquipmentModelsController < ApplicationController
       redirect_to @equipment_model
     elsif params[:deactivation_confirmed]
       Reservation.for_eq_model(@equipment_model.id).finalized.each do |r|
-        r.archive(current_user, 'The equipment model was deactivated.')
+        r.archive(@current_user, 'The equipment model was deactivated.')
          .save(validate: false)
       end
       super

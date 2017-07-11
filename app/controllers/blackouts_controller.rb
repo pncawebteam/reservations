@@ -50,7 +50,7 @@ class BlackoutsController < ApplicationController
     render('new_recurring') && return unless @blackout.valid?
 
     p = blackout_params
-    p[:created_by] = current_user.id
+    p[:created_by] = @current_user.id
 
     # method will return an error message if save is not successful
     flash[:error] = Blackout.create_blackout_set(p, params[:blackout][:days])
@@ -65,7 +65,7 @@ class BlackoutsController < ApplicationController
   def create # rubocop:disable MethodLength
     # create a non-recurring blackout
     p = blackout_params
-    p[:created_by] = current_user.id
+    p[:created_by] = @current_user.id
     @blackout = Blackout.new(p)
 
     # check for conflicts

@@ -30,7 +30,7 @@ describe 'guest users', type: :feature do
 
     it 'redirects to the signin page with errors' do
       visit url_path
-      expect(current_path).to eq(new_user_session_path)
+      expect(current_path).to eq(login_path)
       expect(page).to have_selector('.alert-danger')
     end
   end
@@ -45,7 +45,7 @@ describe 'guest users', type: :feature do
     it 'goes to the correct page with sign in link' do
       visit url_path
       expect(current_path).to eq(url_path)
-      expect(page).to have_link('Sign In', href: new_user_session_path)
+      expect(page).to have_link('Sign In', href: login_path)
     end
   end
 

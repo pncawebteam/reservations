@@ -6,10 +6,10 @@ module ControllerHelpers
     pass_app_setup_check
     allow(request.env['warden']).to receive(:authenticate!).and_return(user)
     # necessary for permissions to work
-    allow(ApplicationController).to receive(:current_user).and_return(user)
+    allow(ApplicationController).to receive(:@current_user).and_return(user)
     allow(Ability).to receive(:new).and_return(Ability.new(user))
     allow_any_instance_of(described_class).to \
-      receive(:current_user).and_return(user)
+      receive(:@current_user).and_return(user)
   end
 
   def pass_app_setup_check

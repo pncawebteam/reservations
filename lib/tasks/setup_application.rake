@@ -6,92 +6,92 @@ namespace :app do
     'reservations site'
   task setup: :environment do
     # Welcome message and create admin user
-    puts ''
-    puts 'Welcome to reservations! Before using your application, we need '\
-      'to create an'
-    puts 'initial superuser account and set some application-wide '\
-      'configurations.'
-    puts 'This superuser account can be used later to create admins, '\
-      'import users'
-    puts 'and change any configurations that you set from this script. '\
-      'With that'
-    puts 'in mind, let\'s get started!'
+    #puts ''
+    #puts 'Welcome to reservations! Before using your application, we need '\
+    #  'to create an'
+    #puts 'initial superuser account and set some application-wide '\
+    #  'configurations.'
+    #puts 'This superuser account can be used later to create admins, '\
+    #  'import users'
+    #puts 'and change any configurations that you set from this script. '\
+    #  'With that'
+    #puts 'in mind, let\'s get started!'
 
-    # ensure no _superusers_ have been created since guest users might have
-    # been
-    if User.where('role = ?', 'superuser').empty?
-      User.destroy_all
-      puts ''
-      puts 'We need to start by creating a superuser account. Please enter the'
-      puts 'following info:'
+    ## ensure no _superusers_ have been created since guest users might have
+    ## been
+    #if User.where('role = ?', 'superuser').empty?
+    #  User.destroy_all
+    #  puts ''
+    #  puts 'We need to start by creating a superuser account. Please enter the'
+    #  puts 'following info:'
 
-      until User.first
-        puts ''
-        puts 'First Name:'
-        first_name = STDIN.gets.chomp
-        puts 'Last Name:'
-        last_name = STDIN.gets.chomp
-        puts 'Phone #:'
-        phone = STDIN.gets.chomp
-        puts 'Email Address:'
-        email = STDIN.gets.chomp
-        if ENV['CAS_AUTH']
-          puts 'Username (i.e. NetID, ensure this is correct):'
-          cas_login = STDIN.gets.chomp
-          username = cas_login
-        else
-          username = email
-          puts 'Password:'
-          password = STDIN.noecho(&:gets).chomp
-          puts 'Confirm Password:'
-          password_confirmation = STDIN.noecho(&:gets).chomp
-        end
-        puts 'Affiliation (i.e. Yale College):'
-        affiliation = STDIN.gets.chomp
+    #  until User.first
+    #    puts ''
+    #    puts 'First Name:'
+    #    first_name = STDIN.gets.chomp
+    #    puts 'Last Name:'
+    #    last_name = STDIN.gets.chomp
+    #    puts 'Phone #:'
+    #    phone = STDIN.gets.chomp
+    #    puts 'Email Address:'
+    #    email = STDIN.gets.chomp
+    #    if ENV['CAS_AUTH']
+    #      puts 'Username (i.e. NetID, ensure this is correct):'
+    #      cas_login = STDIN.gets.chomp
+    #      username = cas_login
+    #    else
+    #      username = email
+    #      puts 'Password:'
+    #      password = STDIN.noecho(&:gets).chomp
+    #      puts 'Confirm Password:'
+    #      password_confirmation = STDIN.noecho(&:gets).chomp
+    #    end
+    #    puts 'Affiliation (i.e. Yale College):'
+    #    affiliation = STDIN.gets.chomp
 
-        ActiveRecord::Base.transaction do
-          begin
-            User.create! do |u|
-              u.first_name = first_name
-              u.last_name = last_name
-              u.phone = phone
-              u.email = email
-              u.cas_login = cas_login if ENV['CAS_AUTH']
-              u.username = username
-              u.affiliation = affiliation
-              u.role = 'superuser'
-              u.view_mode = 'superuser'
-              unless ENV['CAS_AUTH']
-                u.password = password
-                u.password_confirmation = password_confirmation
-              end
-            end
-          rescue => e
-            ActiveRecord::Rollback # rubocop:disable Lint/Void
-            puts 'Oops! Your superuser account was not saved for the '\
-              'reasons listed below'
-            puts 'Please double check that you\'re entering valid '\
-              "information for each item.\n"
-            puts e
-          end
-        end # transaction
+    #    ActiveRecord::Base.transaction do
+    #      begin
+    #        User.create! do |u|
+    #          u.first_name = first_name
+    #          u.last_name = last_name
+    #          u.phone = phone
+    #          u.email = email
+    #          u.cas_login = cas_login if ENV['CAS_AUTH']
+    #          u.username = username
+    #          u.affiliation = affiliation
+    #          u.role = 'superuser'
+    #          u.view_mode = 'superuser'
+    #          unless ENV['CAS_AUTH']
+    #            u.password = password
+    #            u.password_confirmation = password_confirmation
+    #          end
+    #        end
+    #      rescue => e
+    #        ActiveRecord::Rollback # rubocop:disable Lint/Void
+    #        puts 'Oops! Your superuser account was not saved for the '\
+    #          'reasons listed below'
+    #        puts 'Please double check that you\'re entering valid '\
+    #          "information for each item.\n"
+    #        puts e
+    #      end
+    #    end # transaction
 
-        next unless User.first
-        puts 'Your user was saved successfully! Now we\'ll set the '\
-          'application'
-        puts 'configurations.'
-      end
-    else
-      puts ''
-      puts 'There appears to already be a user in the database. If you wish '\
-        'to run this'
-      puts 'part of the setup script, please reset your database and run the'
-      puts '$rake app:setup command again. You can use the command'
-      puts '$rake db:migrate:reset to reset your database completely. '\
-        'WARNING: This will'
-      puts 'delete any information that you have already stored in the '\
-        'database.'
-    end
+    #    next unless User.first
+    #    puts 'Your user was saved successfully! Now we\'ll set the '\
+    #      'application'
+    #    puts 'configurations.'
+    #  end
+    #else
+    #  puts ''
+    #  puts 'There appears to already be a user in the database. If you wish '\
+    #    'to run this'
+    #  puts 'part of the setup script, please reset your database and run the'
+    #  puts '$rake app:setup command again. You can use the command'
+    #  puts '$rake db:migrate:reset to reset your database completely. '\
+    #    'WARNING: This will'
+    #  puts 'delete any information that you have already stored in the '\
+    #    'database.'
+    #end
 
     # app config default variables
     DEFAULT_MSGS = File.join(Rails.root, 'db', 'default_messages')

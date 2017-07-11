@@ -390,7 +390,7 @@ class Reservation < ActiveRecord::Base
     return self if new_notes.empty? && changes.empty?
     # write notes header
     header = "### Edited on #{Time.zone.now.to_s(:long)} by "\
-      "#{current_user.md_link}\n"
+      "#{@current_user.md_link}\n"
     self.notes = notes ? notes + "\n\n" + header : header
 
     # add notes if they exist
@@ -437,8 +437,7 @@ class Reservation < ActiveRecord::Base
   end
 
   # rubocop:disable PerceivedComplexity
-  def make_notes(procedure_verb, new_notes, incomplete_procedures,
-                 current_user)
+  def make_notes(procedure_verb, new_notes, incomplete_procedures, current_user)
     # handles the reservation notes from the new notes
     #
     # takes the new notes and a string, 'checked in' or 'checked out' as the
@@ -446,7 +445,7 @@ class Reservation < ActiveRecord::Base
 
     # write notes header
     header = "### #{procedure_verb} on #{Time.zone.now.to_s(:long)} by "\
-      "#{current_user.md_link}\n"
+      "#{@current_user.md_link}\n"
     self.notes = self.notes ? self.notes + "\n\n" + header : header
 
     # If no new notes and no missed procedures, set e-mail flag to false and

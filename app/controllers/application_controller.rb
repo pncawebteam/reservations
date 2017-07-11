@@ -4,12 +4,18 @@
 
 # rubocop:disable ClassLength
 class ApplicationController < ActionController::Base
+  include Auth
+
   helper :layout
   # See ActionController::RequestForgeryProtection for details
   protect_from_forgery
+
+  before_action :logged_in?
+
   before_action :app_setup_check
-  before_action :authenticate_user!, unless: :skip_authentication?
-  before_action :cart, unless: :devise_controller?
+  before_action :cart #TODO This needs to account for session state
+
+  helper_method :cart, :current_user, :logged_in?
 
   with_options unless: ->(_u) { User.count == 0 } do |c|
     c.before_filter :load_configs
@@ -20,11 +26,9 @@ class ApplicationController < ActionController::Base
     c.before_filter :make_cart_compatible
   end
 
-  helper_method :cart, :current_or_guest_user
-
   rescue_from CanCan::AccessDenied do |_exception|
     flash[:error] = 'Sorry, that action or page is restricted.'
-    if current_user && current_user.view_mode == 'banned'
+    if @current_user && @current_user.view_mode == 'banned'
       flash[:error] = 'That action is restricted; it looks like you\'re a '\
         'banned user! Talk to your administrator, maybe they\'ll be willing '\
         'to lift your restriction.'
@@ -41,7 +45,7 @@ class ApplicationController < ActionController::Base
   # -------- before_filter methods -------- #
 
   def app_setup_check
-    return if AppConfig.first && (User.count != 0)
+    return if AppConfig.first# && (User.count != 0)
     flash[:notice] = 'Hey there! It looks like you haven\'t fully set up '\
       'your application yet. To create your first superuser and configure '\
       'the application, please run $bundle exec rake app:setup in the '\
@@ -55,7 +59,7 @@ class ApplicationController < ActionController::Base
   end
 
   def seen_app_configs
-    return if AppConfig.check(:viewed) || current_user.nil?
+    return if AppConfig.check(:viewed) || @current_user.nil?
     if can? :edit, :app_config
       flash[:notice] = 'Since this is your first time viewing the '\
         'application configurations, we recommend that you take some time '\
@@ -72,7 +76,7 @@ class ApplicationController < ActionController::Base
 
   def cart
     # make sure we reset the reserver when we log in
-    reserver = current_user ? current_user : current_or_guest_user
+    reserver = @current_user
     session[:cart] ||= Cart.new
     # if there is no cart reserver_id or the old cart reserver was deleted
     # (i.e. we've logged in and the guest user was destroyed)
@@ -94,9 +98,9 @@ class ApplicationController < ActionController::Base
                       'normal' => 'Patron',
                       'guest' => 'Guest' }
     authorize! :view_as, :superuser if params[:view_mode] == 'superuser'
-    current_user.view_mode = params[:view_mode]
-    current_user.save!(validate: false)
-    flash[:notice] = "Viewing as #{messages_hash[current_user.view_mode]}."
+    @current_user.view_mode = params[:view_mode]
+    @current_user.save!(validate: false)
+    flash[:notice] = "Viewing as #{messages_hash[@current_user.view_mode]}."
     redirect_to(:back) && return
   end
 
@@ -106,11 +110,11 @@ class ApplicationController < ActionController::Base
   end
 
   def check_view_mode
-    return unless current_user
+    return unless @current_user
     return unless (can? :change, :views) &&
-                  (current_user.view_mode != current_user.role)
+                  (@current_user.view_mode != @current_user.role)
     doc_link = ActionController::Base.helpers.link_to('here', 'https://yalestc.github.io/reservations/')
-    flash[:persistent] = "Currently viewing as #{current_user.view_mode} "\
+    flash[:persistent] = "Currently viewing as #{@current_user.view_mode} "\
       'user. You can switch back to your regular view '\
       "#{ActionController::Base.helpers.link_to('below', '#view_as')} (see "\
       "#{doc_link} for details)."
@@ -132,15 +136,6 @@ class ApplicationController < ActionController::Base
   # check to see if the guest user functionality is disabled
   def guests_disabled?
     !AppConfig.check(:enable_guests)
-  end
-
-  # check to see if we should skip authentication; either looks to see if the
-  # Devise controller is running or if we're utilizing one of the guest-
-  # accessible routes with guests disabled
-  def skip_authentication?
-    devise_controller? ||
-      (%w(update_cart empty_cart terms_of_service)
-      .include?(params[:action]) && !guests_disabled?)
   end
 
   #-------- end before_filter methods --------#
@@ -191,11 +186,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # if user is logged in, return current_user, else return guest_user
+  # if user is logged in, return @current_user, else return guest_user
   # https://github.com/plataformatec/devise/wiki/How-To:-Create-a-guest-user
-  def current_or_guest_user
-    current_user ? current_user : guest_user
-  end
+  # def current_or_guest_user
+  # @current_user ? @current_user : guest_user
+  # end
 
   # find guest_user object associated with the current session,
   # creating one as needed
@@ -205,7 +200,7 @@ class ApplicationController < ActionController::Base
 
   # allow CanCanCan to use the guest user when we're not logged in
   def current_ability
-    @current_ability ||= Ability.new(current_or_guest_user)
+    @current_ability ||= Ability.new(@current_user)
   end
 
   # rubocop:disable MethodLength, AbcSize
@@ -322,10 +317,10 @@ class ApplicationController < ActionController::Base
   # modify redirect after signing in
   def after_sign_in_path_for(user)
     # CODE FOR CAS LOGIN --> NEW USER
-    if ENV['CAS_AUTH'] && current_user && current_user.id.nil? &&
-       current_user.username
+    if ENV['CAS_AUTH'] && @current_user && @current_user.id.nil? &&
+       @current_user.username
       # store username in session since there's a request in between
-      session[:new_username] = current_user.username
+      session[:new_username] = @current_user.username
       new_user_path
     else
       super

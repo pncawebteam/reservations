@@ -72,7 +72,7 @@ class CategoriesController < ApplicationController
     elsif params[:deactivation_confirmed]
       @category.equipment_models.each do |em|
         Reservation.for_eq_model(em.id).finalized.each do |r|
-          r.archive(current_user, 'The category was deactivated.')
+          r.archive(@current_user, 'The category was deactivated.')
            .save(validate: false)
         end
       end

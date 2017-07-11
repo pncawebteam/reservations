@@ -38,7 +38,7 @@
             <li class="nav-header">View As:</li>
             <div class="btn-group dropup">
               <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-              <%= get_role_name current_user.view_mode %>
+              <%= get_role_name @current_user.view_mode %>
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
@@ -47,7 +47,7 @@
                   <% viewmode_array.unshift 'superuser' %>
                 <% end %>
                 <% viewmode_array.each do |role| %>
-                  <% if current_user.view_mode == role %>
+                  <% if @current_user.view_mode == role %>
                     <li class="disabled">
                       <a href="#"><%= get_role_name role %></a>
                     </li>

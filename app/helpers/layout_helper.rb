@@ -39,7 +39,7 @@ module LayoutHelper
       # this variable is called in _navbar.html.erb to list a user's current
       # reservations in the dropdown.
       @current_reservations =
-        current_or_guest_user.reservations
+        @current_user.reservations
                              .active_or_requested.includes(:equipment_model)
       count = @current_reservations.size
     end
@@ -47,7 +47,7 @@ module LayoutHelper
   # rubocop:enable UselessAssignment
 
   def equipment_count
-    @current_equipment = current_or_guest_user.reservations.checked_out
+    @current_equipment = @current_user.reservations.checked_out
     @current_equipment.size
   end
 

@@ -10,21 +10,20 @@ class ApplicationController < ActionController::Base
   # See ActionController::RequestForgeryProtection for details
   protect_from_forgery
 
-  before_action :logged_in?
+  before_action :login_required, :logged_in?, :cart
 
   before_action :app_setup_check
-  before_action :cart #TODO This needs to account for session state
 
   helper_method :cart, :current_user, :logged_in?
 
-  with_options unless: ->(_u) { User.count == 0 } do |c|
-    c.before_filter :load_configs
-    c.before_filter :seen_app_configs
-    c.before_filter :fix_cart_date
-    c.before_filter :set_view_mode
-    c.before_filter :check_view_mode
-    c.before_filter :make_cart_compatible
-  end
+  #with_options unless: ->(_u) { User.count == 0 } do |c|
+    before_filter :load_configs
+    before_filter :seen_app_configs
+    before_filter :fix_cart_date
+    before_filter :set_view_mode
+    before_filter :check_view_mode
+    before_filter :make_cart_compatible
+  #end
 
   rescue_from CanCan::AccessDenied do |_exception|
     flash[:error] = 'Sorry, that action or page is restricted.'
@@ -76,16 +75,19 @@ class ApplicationController < ActionController::Base
 
   def cart
     # make sure we reset the reserver when we log in
-    reserver = @current_user
-    session[:cart] ||= Cart.new
-    # if there is no cart reserver_id or the old cart reserver was deleted
-    # (i.e. we've logged in and the guest user was destroyed)
-    if session[:cart].reserver_id.nil? ||
-       User.find_by_id(session[:cart].reserver_id).nil?
-      session[:cart].reserver_id = reserver.id
+    if @current_user
+      reserver = @current_user
+      session[:cart] ||= Cart.new
+      # if there is no cart reserver_id or the old cart reserver was deleted
+      # (i.e. we've logged in and the guest user was destroyed)
+      if session[:cart].reserver_id.nil? ||
+         User.find_by_id(session[:cart].reserver_id).nil?
+        session[:cart].reserver_id = reserver.id
+      end
+      session[:cart].fix_items
+
+      session[:cart] #implict return
     end
-    session[:cart].fix_items
-    session[:cart]
   end
 
   def set_view_mode
@@ -149,7 +151,7 @@ class ApplicationController < ActionController::Base
       cart.fix_due_date
       cart.reserver_id =
         if params[:reserver_id].blank?
-          cart.reserver_id = current_or_guest_user.id
+          cart.reserver_id = @current_user.id
         else
           params[:reserver_id]
         end

@@ -38,6 +38,10 @@ gem 'rubyzip', '~> 1.2.0'
 gem 'permanent_records', '= 4.1.5'
 gem 'nilify_blanks', '~> 1.2.1'
 
+# services
+gem 'faraday'
+gem 'faraday_middleware'
+
 # ui
 gem 'jquery-rails', '~> 4.1.1'
 gem 'jquery-ui-rails', '~> 5.0.5'

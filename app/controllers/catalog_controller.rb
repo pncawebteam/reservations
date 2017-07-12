@@ -21,7 +21,7 @@ class CatalogController < ApplicationController
   # --------- end before filter methods --------- #
 
   def index
-    @reserver_id = session[:cart].reserver_id
+    @reserver_id = session[:cart] ? session[:cart].reserver_id : nil
     prepare_pagination
     prepare_catalog_index_vars
   end

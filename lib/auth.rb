@@ -15,13 +15,20 @@ module Auth
     if master_user = locate_master_user(master_id)
 
       local_user = User.find_or_create_by(uuid: master_id)
+
       local_user.identity = master_user.to_json
 
-      local_user.login = local_user.identity['username']
+      local_user.username = local_user.identity['username']
+      local_user.email = local_user.identity['email']
+
+      local_user.first_name = local_user.identity['profile']['first_name']
+      local_user.last_name = local_user.identity['profile']['last_name']
+      local_user.affiliation = 'test'
 
       local_user.save
 
-      #  e = local_user.errors.full_messages
+      #e = local_user.errors.full_messages
+
     end
 
     local_user
@@ -32,16 +39,15 @@ module Auth
   protected
 
     def get_current_user
-
       if session[:ida_id].blank?
         @current_user = nil
-
       elsif @current_user.blank?
         # verify that the global user identifier exists in session
         if master_id = session[:ida_id]
           # locate the user locally or initialize a new instance if it cannot be found
           #  .. will return nil if user cannot be located
           @current_user = find_or_init_local_user(master_id)
+
         end
       end
 
@@ -80,7 +86,7 @@ module Auth
     end
 
     def handshake
-      'c6a7435a-4e3b-4393-9355-509cf93601a1'
+      'xxx'
     end
 
 

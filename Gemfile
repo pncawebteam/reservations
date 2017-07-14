@@ -12,7 +12,7 @@ gem 'jbuilder', '~> 2.4.0'
 gem 'activerecord-session_store'
 
 # simulate environment variables
-gem 'dotenv-rails', '~> 2.1.1', :require => 'dotenv/rails-now'
+gem 'dotenv-rails', '~> 2.1.1'#, :require => 'dotenv/rails-now'
 
 # authentication / authorization
 #gem 'devise', '~> 4.1.1'
